@@ -34,60 +34,72 @@ if uploaded_files:
             continue
         
         # Display uploaded file information (name and size)
-        st.write(f"**📄 File Name:** {file.name}")
-        st.write(f"**📏 File Size:** {file.size / 1024:.2f} KB")  # File size in KB
+        st.write(f"**File Name:** {file.name}")
+        st.write(f"**File Size:** {file.size / 1024:.2f} KB")  # File size in KB
 
         # Preview the first 5 rows of the uploaded file
-        st.write("🔍 Preview of the Uploaded File:")
+        st.write("Preview of the Uploaded File:")
         st.dataframe(df.head())  # Display a scrollable preview of the data
         
         # Section for data cleaning options
-        st.subheader("🛠️ Data Cleaning Options")
-        if st.checkbox(f"Clean Data for {file.name}"):
-            col1, col2 = st.columns(2)  # Split cleaning options into two columns
+        st.subheader("Data Cleaning Options")
+        if st.checkbox(f'Clean Data for {file.name}'):
+            col1, col2 = st.columns(2)
+
             with col1:
-                # Button to remove duplicate rows from the DataFrame
                 if st.button(f"Remove Duplicates from {file.name}"):
                     df.drop_duplicates(inplace=True)
-                    st.write("Duplicates Removed!")
+                    st.write("Duplicates Removed Successfully")
+
             with col2:
-                # Button to fill missing numeric values with column means
                 if st.button(f"Fill Missing Values for {file.name}"):
                     numeric_cols = df.select_dtypes(include=['number']).columns
                     df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
-                    st.write("Missing Values in Numeric Columns Filled with Column Means!")
+                    st.write("Missing Values Filled Successfully")
 
-        # Section to choose specific columns to convert
-        st.subheader("🎯 Select Columns to Convert")
-        columns = st.multiselect(f"Choose Columns for {file.name}", df.columns, default=df.columns)
-        df = df[columns]  # Filters the DataFrame to the selected columns
         
-        # Visualization section for uploaded data
-        st.subheader("📊 Data Visualization")
+        st.subheader("Select Coloumns to Convert")
+        columns_to_convert = st.multiselect(f"Choose columns for {file.name}", df.columns, default=df.columns)
+
+        st.subheader("Data Visualization")
         if st.checkbox(f"Show Visualization for {file.name}"):
-            st.bar_chart(df.select_dtypes(include='number').iloc[:, :2])  # Plot the first two numeric columns as a bar chart
+            st.bar_chart(df.select_dtypes(include='number').iloc[:, :2])
+
         
-        # Section to choose file conversion type (CSV or Excel)
-        st.subheader("🔄 Conversion Options")
-        conversion_type = st.radio(f"Convert {file.name} to:", ["CSV", "Excel"], key=file.name)
+        st.subheader("Conversion Options")
+        conversion_type = st.radio(f"Convert {file.name} to:", ["CSV", "Excel"])
+
         if st.button(f"Convert {file.name}"):
-            buffer = BytesIO()  # Creates in-memory buffer for file output
+            buffer = BytesIO()
+
             if conversion_type == "CSV":
-                df.to_csv(buffer, index=False)  # Save DataFrame as CSV in buffer
-                file_name = file.name.replace(file_extension, ".csv")
-                mime_type = "text/csv"
-            elif conversion_type == "Excel":
-                df.to_excel(buffer, index=False, engine='openpyxl')  # Save as Excel using openpyxl
-                file_name = file.name.replace(file_extension, ".xlsx")
-                mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            buffer.seek(0)
+                df.to_csv(buffer, index=False)
+                # Save the CSV file to the buffer
+
+                file_name = file.name.replace("file_extension", ".csv")
+
+                mime_type = 'text/csv'
             
-            # Download button for the converted file
+            elif conversion_type == "Excel":
+                df.to_excel(buffer, index=False, engine='openpyxl') 
+                # Save as Excel file using openpyxl engine
+
+                file_name = file.name.replace(file_extension, '.xlsx')
+
+                mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+            buffer.seek(0)
+
             st.download_button(
-                label=f"⬇️ Download {file.name} as {conversion_type}",
-                data=buffer,
-                file_name=file_name,
-                mime=mime_type
+                label=f"Download {file.name} as {conversion_type}",
+                data = buffer,
+                file_name = file_name,
+                mime = mime_type
             )
 
-st.success("🎉 All files processed successfully!")  # Display success message when all files are processed
+            st.success("All files processed successfully")
+                
+
+
+
+
