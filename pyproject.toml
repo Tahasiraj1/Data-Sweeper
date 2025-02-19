@@ -7,7 +7,7 @@ authors = [
     { name = "Tahasiraj1", email = "tahasiraj242@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = ["streamlit", "pandas"]
+dependencies = []
 
 [project.scripts]
 explore-uv = "explore_uv:main"
